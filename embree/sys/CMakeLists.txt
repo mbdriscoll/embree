@@ -16,6 +16,8 @@
 
 CONFIGURE_CPU ()
 
+include_directories(/home/mbdriscoll/opt/bupc-2.16.2/opt/include)
+
 ADD_LIBRARY(sys${EXT} STATIC
   platform.cpp
   sysinfo.cpp
@@ -29,6 +31,7 @@ ADD_LIBRARY(sys${EXT} STATIC
   sync/mutex.cpp
   sync/condition.cpp
   stl/string.cpp
+  dist.cpp
 )
 
 IF (__XEON_PHI__)
@@ -36,3 +39,4 @@ IF (__XEON_PHI__)
 ELSE ()
   TARGET_LINK_LIBRARIES(sys${EXT} pthread dl)
 ENDIF() 
+
