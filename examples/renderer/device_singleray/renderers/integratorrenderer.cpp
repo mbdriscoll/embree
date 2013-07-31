@@ -80,15 +80,10 @@ namespace embree
     renderer->integrator->requestSamples(renderer->samplers, scene);
     renderer->samplers->init(iteration,renderer->filter);
 
-#if 1
     TaskScheduler::EventSync event;
     TaskScheduler::Task task(&event,_renderTile,this,TaskScheduler::getNumThreads(),_finish,this,"render::tile");
     TaskScheduler::addTask(-1,TaskScheduler::GLOBAL_BACK,&task);
     event.sync();
-#else
-    new (&task) TaskScheduler::Task (NULL,_renderTile,this,TaskScheduler::getNumThreads(),_finish,this,"render::tile");
-    TaskScheduler::addTask(-1,TaskScheduler::GLOBAL_BACK,&task);
-#endif
   }
 
   void IntegratorRenderer::RenderJob::finish(size_t threadIndex, size_t threadCount, TaskScheduler::Event* event)
