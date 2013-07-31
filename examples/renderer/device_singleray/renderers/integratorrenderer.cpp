@@ -116,16 +116,13 @@ namespace embree
     /*! create a new sampler */
     IntegratorState state;
     if (taskIndex == taskCount-1) t0 = getSeconds();
-
-    size_t tilesPerThread = (numTilesX*numTilesY + threadCount + 1) / threadCount;
-    size_t startTile = threadIndex * tilesPerThread;
-    size_t endTile = std::min(startTile+tilesPerThread, numTilesX*numTilesY);
-    printf("Thread %d rendering tiles %d to %d.\n", threadIndex, startTile, endTile);
-
+    
     /*! tile pick loop */
-    for (int tile = startTile; tile < endTile; tile++) {
-
-      tileID = tile;
+    while (true)
+    {
+      /*! pick a new tile */
+      size_t tile = tileID++;
+      if (tile >= numTilesX*numTilesY) break;
 
       /*! process all tile samples */
       const int tile_x = (tile%numTilesX)*TILE_SIZE;
