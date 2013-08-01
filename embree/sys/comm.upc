@@ -21,18 +21,19 @@ int UPC_GetSize() {
     return THREADS;
 }
 
-void UPC_CombineFramebuffers(float* data, int nBytes) {
-    shared [0] float * remote_fb = upc_all_alloc(1, nBytes);
+void UPC_CombineFramebuffers(char* data, int nBytes) {
+    shared [0] char * remote_fb = upc_all_alloc(1, nBytes);
+    char * local_fb = (char *) &remote_fb[0];
 
     for (int t = 1; t < THREADS; t++) {
         if (MYTHREAD == t)
-            upc_memput( remote_fb, data, nBytes );
+            upc_memput( &remote_fb[0], &data[0], nBytes );
 
         upc_barrier; // ===================================
 
         if (MYTHREAD == 0)
-            for (int i = 0; i < nBytes/sizeof(float); i++)
-                data[i] += remote_fb[i];
+            for (int i = 0; i < nBytes; i++)
+                data[i] += local_fb[i];
 
         upc_barrier; // ===================================
     }

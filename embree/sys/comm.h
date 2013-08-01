@@ -9,7 +9,7 @@ int UPC_Exit();
 int UPC_GetRank();
 int UPC_GetSize();
 
-void UPC_CombineFramebuffers(float* fb, int nBytes);
+void UPC_CombineFramebuffers(char* fb, int nBytes);
 
 } // extern C
 

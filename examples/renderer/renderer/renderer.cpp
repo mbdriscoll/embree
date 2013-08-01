@@ -223,17 +223,18 @@ namespace embree
     for (int i=0; i<g_numBuffers; i++)
       g_device->rtSwapBuffers(g_frameBuffer);
     
-    /* store to disk if rank 0*/
+    /* store to disk if rank 0 */
     void* ptr = g_device->rtMapFrameBuffer(g_frameBuffer);
 
     // sum-reduce all framebuffers
-    UPC_CombineFramebuffers( (float*) ptr, g_width * g_height * sizeof(Color));
+    assert( g_format == "RGBA8" );
+    UPC_CombineFramebuffers( (char*) ptr, g_width * g_height * sizeof(Col4c));
 
     if (UPC_GetRank() == 0) {
         Ref<Image> image = null;
-        if      (g_format == "RGB8"        )  image = new Image3c(g_width, g_height, (Col3c*)ptr); 
+        if      (g_format == "RGB8"        )  image = new Image3c(g_width, g_height, (Col3c*)ptr);
         else if (g_format == "RGBA8"       )  image = new Image4c(g_width, g_height, (Col4c*)ptr);
-        else if (g_format == "RGB_FLOAT32" )  image = new Image3f(g_width, g_height, (Col3f*)ptr); 
+        else if (g_format == "RGB_FLOAT32" )  image = new Image3f(g_width, g_height, (Col3f*)ptr);
         else if (g_format == "RGBA_FLOAT32")  image = new Image4f(g_width, g_height, (Col4f*)ptr);
         else throw std::runtime_error("unsupported framebuffer format: "+g_format);
         storeImage(image, fileName);
