@@ -25,6 +25,9 @@
 #pragma comment (lib, "pthreadVC.lib")
 #endif
 
+// mbd: disable this for now
+#define ALLOW_AFFINITY 0
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Windows Platform
 ////////////////////////////////////////////////////////////////////////////////
@@ -105,7 +108,11 @@ namespace embree
   {
     HANDLE thread = CreateThread(NULL, stack_size, (LPTHREAD_START_ROUTINE)threadStartup, new ThreadStartupData(f,arg), 0, NULL);
     if (thread == NULL) throw std::runtime_error("cannot create thread");
+
+#if ALLOW_AFFINITY
     if (threadID >= 0) setAffinity(thread, threadID);
+#endif
+
     return thread_t(thread);
   }
 
@@ -226,8 +233,10 @@ namespace embree
     _mm_setcsr(_mm_getcsr() | /*FTZ:*/ (1<<15) | /*DAZ:*/ (1<<6));
 
 #if !defined(__LINUX__) || defined(__MIC__)
+#if ALLOW_AFFINITY
     if (parg->affinity >= 0)
       setAffinity(parg->affinity);
+#endif
 #endif
 
 
@@ -250,12 +259,14 @@ namespace embree
     
     /* set affinity */
 #if defined(__LINUX__)
+#if ALLOW_AFFINITY
     if (threadID >= 0) {
       cpu_set_t cset;
       CPU_ZERO(&cset);
       CPU_SET(threadID, &cset);
       pthread_attr_setaffinity_np(&attr,sizeof(cpu_set_t),&cset);
     }
+#endif
 #endif
 
     /* create thread */
