@@ -1,4 +1,5 @@
 ## ======================================================================== ##
+
 ## Copyright 2009-2013 Intel Corporation                                    ##
 ##                                                                          ##
 ## Licensed under the Apache License, Version 2.0 (the "License");          ##
@@ -18,6 +19,12 @@ CONFIGURE_CPU ()
 
 include_directories(/home/mbdriscoll/opt/bupc-2.16.2/opt/include)
 
+# mbd: might be a cleaner way to do this...
+add_custom_command( OUTPUT comm.o
+  COMMAND upcc ${CMAKE_C_FLAGS} -c -o ${CMAKE_CURRENT_BINARY_DIR}/comm.o ${CMAKE_SOURCE_DIR}/embree/sys/comm.upc
+  MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/embree/sys/comm.upc
+)
+
 ADD_LIBRARY(sys${EXT} STATIC
   platform.cpp
   sysinfo.cpp
@@ -31,7 +38,7 @@ ADD_LIBRARY(sys${EXT} STATIC
   sync/mutex.cpp
   sync/condition.cpp
   stl/string.cpp
-  UPC.cpp
+  comm.o
 )
 
 IF (__XEON_PHI__)

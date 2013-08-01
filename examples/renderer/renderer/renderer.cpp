@@ -16,7 +16,7 @@
 
 #include "sys/platform.h"
 #include "sys/filename.h"
-#include "sys/UPC.h"
+#include "sys/comm.h"
 #include "image/image.h"
 #include "lexers/streamfilters.h"
 #include "lexers/parsestream.h"
@@ -223,15 +223,22 @@ namespace embree
     for (int i=0; i<g_numBuffers; i++)
       g_device->rtSwapBuffers(g_frameBuffer);
     
-    /* store to disk */
+    /* store to disk if rank 0*/
     void* ptr = g_device->rtMapFrameBuffer(g_frameBuffer);
-    Ref<Image> image = null;
-    if      (g_format == "RGB8"        )  image = new Image3c(g_width, g_height, (Col3c*)ptr); 
-    else if (g_format == "RGBA8"       )  image = new Image4c(g_width, g_height, (Col4c*)ptr);
-    else if (g_format == "RGB_FLOAT32" )  image = new Image3f(g_width, g_height, (Col3f*)ptr); 
-    else if (g_format == "RGBA_FLOAT32")  image = new Image4f(g_width, g_height, (Col4f*)ptr);
-    else throw std::runtime_error("unsupported framebuffer format: "+g_format);
-    storeImage(image, fileName);
+
+    // sum-reduce all framebuffers
+    UPC_CombineFramebuffers( (float*) ptr, g_width * g_height * sizeof(Color));
+
+    if (UPC_GetRank() == 0) {
+        Ref<Image> image = null;
+        if      (g_format == "RGB8"        )  image = new Image3c(g_width, g_height, (Col3c*)ptr); 
+        else if (g_format == "RGBA8"       )  image = new Image4c(g_width, g_height, (Col4c*)ptr);
+        else if (g_format == "RGB_FLOAT32" )  image = new Image3f(g_width, g_height, (Col3f*)ptr); 
+        else if (g_format == "RGBA_FLOAT32")  image = new Image4f(g_width, g_height, (Col4f*)ptr);
+        else throw std::runtime_error("unsupported framebuffer format: "+g_format);
+        storeImage(image, fileName);
+    }
+
     g_device->rtUnmapFrameBuffer(g_frameBuffer);
     g_rendered = true;
   }
@@ -707,7 +714,7 @@ namespace embree
   int main(int argc, char** argv) 
   {
     /* initialize the distributed memory runtime */
-    UPC::Init(argc, argv);
+    UPC_Init(argc, argv);
 
     /*! create stream for parsing */
     Ref<ParseStream> stream = new ParseStream(new CommandLineStream(argc, argv));
@@ -737,7 +744,7 @@ namespace embree
     clearGlobalObjects();
 
     /* teardown the distributed memory runtime */
-    return UPC::Exit();
+    return UPC_Exit();
   }
 }
 
