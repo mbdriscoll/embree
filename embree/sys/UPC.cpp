@@ -4,6 +4,8 @@ extern "C" {
   #include <bupc_extern.h>
 }
 
+namespace UPC {
+
 void Init(int argc, char** argv) {
     bupc_init(&argc, &argv);
 }
@@ -20,4 +22,6 @@ int GetRank() {
 
 int GetSize() {
     return bupc_extern_threads();
+}
+
 }

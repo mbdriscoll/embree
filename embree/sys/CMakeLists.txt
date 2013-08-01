@@ -31,7 +31,7 @@ ADD_LIBRARY(sys${EXT} STATIC
   sync/mutex.cpp
   sync/condition.cpp
   stl/string.cpp
-  dist.cpp
+  UPC.cpp
 )
 
 IF (__XEON_PHI__)

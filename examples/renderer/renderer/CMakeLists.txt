@@ -25,4 +25,7 @@ ADD_EXECUTABLE(renderer
   regression.cpp
 )
 
+SET(CMAKE_UPC_LINK_EXECUTABLE "upcc -link-with=g++ -extern-main <FLAGS> <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <OBJECTS>  -o <TARGET> <LINK_LIBRARIES>")
+set_target_properties(renderer PROPERTIES LINKER_LANGUAGE "UPC")
+
 TARGET_LINK_LIBRARIES(renderer sys lexers loaders image device ${OPENGL_LIBRARY} ${GLUT_LIBRARY})

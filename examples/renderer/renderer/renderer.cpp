@@ -16,6 +16,7 @@
 
 #include "sys/platform.h"
 #include "sys/filename.h"
+#include "sys/UPC.h"
 #include "image/image.h"
 #include "lexers/streamfilters.h"
 #include "lexers/parsestream.h"
@@ -696,6 +697,9 @@ namespace embree
   /* main function in embree namespace */
   int main(int argc, char** argv) 
   {
+    /* initialize the distributed memory runtime */
+    UPC::Init(argc, argv);
+
     /*! create stream for parsing */
     Ref<ParseStream> stream = new ParseStream(new CommandLineStream(argc, argv));
 
@@ -723,7 +727,8 @@ namespace embree
     /*! cleanup */
     clearGlobalObjects();
 
-    return(0);
+    /* teardown the distributed memory runtime */
+    return UPC::Exit();
   }
 }
 
