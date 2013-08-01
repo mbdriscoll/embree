@@ -248,14 +248,14 @@ namespace embree
 
   static void parseNumThreads(Ref<ParseStream> cin)
   {
-    while (true) 
+    while (true)
     {
       std::string tag = cin->peek();
       if (tag == "-threads") {
         cin->getString();
         g_numThreads = cin->getInt();
       }
-      
+
       /*! enable verbose output mode */
       else if (tag == "-verbose") {
         cin->getString();
@@ -584,6 +584,15 @@ namespace embree
         exit(1);
       }
 
+      else if (tag == "-verbose") {
+        std::cerr << "Yer verbose tag needs to be placed earlier in argv." << std::endl;
+      }
+
+      else if (tag == "-threads") {
+        std::cerr << "Yer -threads tag needs to be placed earlier in argv." << std::endl;
+        cin->getInt();
+      }
+
       else if (tag == "-h" || tag == "-?" || tag == "-help" || tag == "--help")
       {
         std::cout << std::endl;
@@ -708,7 +717,7 @@ namespace embree
     parseDevice(stream);
 
     /*! create embree device */
-    if (g_device == NULL) 
+    if (g_device == NULL)
       g_device = Device::rtCreateDevice("default",g_numThreads);
 
     createGlobalObjects();
@@ -718,7 +727,7 @@ namespace embree
 
     /*! if we did no render yet but have loaded a scene, switch to display mode */
     if (!g_rendered && g_prims.size()) { //displayMode();
-      if (g_outFileName != "") 
+      if (g_outFileName != "")
         outputMode(g_outFileName);
       else
         displayMode();
