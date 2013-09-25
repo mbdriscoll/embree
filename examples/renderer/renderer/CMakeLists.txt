@@ -25,4 +25,5 @@ ADD_EXECUTABLE(renderer
   regression.cpp
 )
 
-TARGET_LINK_LIBRARIES(renderer sys lexers loaders image device ${OPENGL_LIBRARY} ${GLUT_LIBRARY})
+include_directories(${UPCXX_INCLUDE_DIR})
+TARGET_LINK_LIBRARIES(renderer sys lexers loaders image device ${OPENGL_LIBRARY} ${GLUT_LIBRARY} ${UPCXX_LIBRARIES})

@@ -66,6 +66,10 @@ MACRO( CONFIGURE_SPMD )
   ENDIF ()
 ENDMACRO( CONFIGURE_SPMD )
 
+MACRO( CONFIGURE_UPCXX )
+  find_package(UPCXX REQUIRED)
+ENDMACRO( CONFIGURE_UPCXX )
+
 ##############################################################
 # search paths
 ##############################################################

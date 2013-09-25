@@ -15,6 +15,7 @@
 ## ======================================================================== ##
 
 CONFIGURE_CPU ()
+CONFIGURE_UPCXX ()
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -37,6 +38,8 @@ IF (__XEON_PHI__)
   ADD_EXECUTABLE(device_singleray${EXT} ${SOURCES})
   TARGET_LINK_LIBRARIES(device_singleray${EXT} sys${EXT} embree${EXT} coi_server${EXT})
 ELSE ()
+  include_directories(${UPCXX_INCLUDE_DIR})
   ADD_LIBRARY(device_singleray${EXT} SHARED ${SOURCES})
-  TARGET_LINK_LIBRARIES(device_singleray${EXT} sys${EXT} embree${EXT} image${EXT})
+  TARGET_LINK_LIBRARIES(device_singleray${EXT} sys${EXT} embree${EXT} image${EXT} ${UPCXX_LIBRARIES})
+
 ENDIF ()

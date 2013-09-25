@@ -14,6 +14,8 @@
 // limitations under the License.                                           //
 // ======================================================================== //
 
+#include <upcxx.h>
+
 #include "sys/platform.h"
 #include "sys/filename.h"
 #include "image/image.h"
@@ -696,6 +698,9 @@ namespace embree
   /* main function in embree namespace */
   int main(int argc, char** argv) 
   {
+    /*! initialize UPCXX */
+    upcxx::init(&argc, &argv);
+
     /*! create stream for parsing */
     Ref<ParseStream> stream = new ParseStream(new CommandLineStream(argc, argv));
 
@@ -722,6 +727,9 @@ namespace embree
 
     /*! cleanup */
     clearGlobalObjects();
+
+    /*! finalize UPCXX */
+    upcxx::finalize();
 
     return(0);
   }
