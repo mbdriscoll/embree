@@ -30,6 +30,7 @@ ADD_EXECUTABLE(renderer
 )
 
 TARGET_LINK_LIBRARIES(renderer sys lexers loaders image device
+  device_singleray
   -L${UPCXX_LIBRARY_PATH} upcxx
   -L${GASNET_LIBRARY_PATH} gasnet-mpi-seq ammpi
   ${MPI_C_LIBRARIES}

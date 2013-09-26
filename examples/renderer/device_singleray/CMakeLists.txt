@@ -42,7 +42,7 @@ ELSE ()
   include_directories(${UPCXX_INCLUDE_DIR})
   include_directories(${GASNET_INCLUDE_DIR})
   include_directories(${GASNET_CONDUIT_INCLUDE_DIR})
-  ADD_LIBRARY(device_singleray${EXT} SHARED ${SOURCES})
+  ADD_LIBRARY(device_singleray${EXT} STATIC ${SOURCES})
   TARGET_LINK_LIBRARIES(device_singleray${EXT} sys${EXT} embree${EXT} image${EXT})
 
 ENDIF ()

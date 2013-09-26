@@ -22,6 +22,7 @@
 #include "lexers/streamfilters.h"
 #include "lexers/parsestream.h"
 #include "device/loaders/loaders.h"
+#include "device_singleray/api/singleray_device.h"
 #include "glutdisplay.h"
 
 namespace embree
@@ -729,7 +730,7 @@ namespace embree
 
     /*! create embree device */
     if (g_device == NULL) 
-      g_device = Device::rtCreateDevice("default",g_numThreads);
+      g_device = new SingleRayDevice(g_numThreads, g_verbose_output);
 
     createGlobalObjects();
 
