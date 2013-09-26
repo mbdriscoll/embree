@@ -231,13 +231,19 @@ namespace embree
     std::vector<char> tmpptr((char*)ptr, ((char*)ptr)+g_width*g_height*4);
     upcxx::upcxx_reduce<char>((char*) &tmpptr[0], (char*) ptr, g_width*g_height*4, 0, UPCXX_SUM, UPCXX_CHAR);
 
-    Ref<Image> image = null;
-    if      (g_format == "RGB8"        )  image = new Image3c(g_width, g_height, (Col3c*)ptr); 
-    else if (g_format == "RGBA8"       )  image = new Image4c(g_width, g_height, (Col4c*)ptr);
-    else if (g_format == "RGB_FLOAT32" )  image = new Image3f(g_width, g_height, (Col3f*)ptr); 
-    else if (g_format == "RGBA_FLOAT32")  image = new Image4f(g_width, g_height, (Col4f*)ptr);
-    else throw std::runtime_error("unsupported framebuffer format: "+g_format);
-    storeImage(image, fileName);
+    // buggy without this
+    upcxx::barrier();
+
+    if (MYTHREAD == 0) {
+        Ref<Image> image = null;
+        if      (g_format == "RGB8"        )  image = new Image3c(g_width, g_height, (Col3c*)ptr); 
+        else if (g_format == "RGBA8"       )  image = new Image4c(g_width, g_height, (Col4c*)ptr);
+        else if (g_format == "RGB_FLOAT32" )  image = new Image3f(g_width, g_height, (Col3f*)ptr); 
+        else if (g_format == "RGBA_FLOAT32")  image = new Image4f(g_width, g_height, (Col4f*)ptr);
+        else throw std::runtime_error("unsupported framebuffer format: "+g_format);
+        storeImage(image, fileName);
+    }
+
     g_device->rtUnmapFrameBuffer(g_frameBuffer);
     g_rendered = true;
   }

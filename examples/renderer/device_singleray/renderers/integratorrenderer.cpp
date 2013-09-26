@@ -98,17 +98,19 @@ namespace embree
     if (renderer->showProgress) progress.end();
     double dt = getSeconds()-t0;
 
-     /*! print fps, render time, and rays per second */
-    std::ostringstream stream;
-    stream << "render  ";
-    stream.setf(std::ios::fixed, std::ios::floatfield);
-    stream.precision(2);
-    stream << 1.0f/dt << " fps, ";
-    stream.precision(0);
-    stream << dt*1000.0f << " ms, ";
-    stream.precision(3);
-    stream << atomicNumRays/dt*1E-6 << " mrps";
-    std::cout << stream.str() << std::endl;
+    if (MYTHREAD == 0) {
+        /*! print fps, render time, and rays per second */
+        std::ostringstream stream;
+        stream << "render  ";
+        stream.setf(std::ios::fixed, std::ios::floatfield);
+        stream.precision(2);
+        stream << 1.0f/dt << " fps, ";
+        stream.precision(0);
+        stream << dt*1000.0f << " ms, ";
+        stream.precision(3);
+        stream << atomicNumRays/dt*1E-6 << " mrps";
+        std::cout << stream.str() << std::endl;
+    }
 
     delete this;
   }
