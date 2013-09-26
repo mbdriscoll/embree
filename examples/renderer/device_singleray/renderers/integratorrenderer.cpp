@@ -14,6 +14,8 @@
 // limitations under the License.                                           //
 // ======================================================================== //
 
+#include <upcxx.h>
+
 #include "renderers/integratorrenderer.h"
 
 /* include all integrators */
@@ -117,6 +119,8 @@ namespace embree
     IntegratorState state;
     if (taskIndex == taskCount-1) t0 = getSeconds();
     
+    printf("THREADS %d, MYTHREAD %d\n", THREADS, MYTHREAD);
+
     /*! tile pick loop */
     while (true)
     {
