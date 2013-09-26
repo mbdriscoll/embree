@@ -16,8 +16,15 @@
 
 FIND_PACKAGE(GLUT REQUIRED)
 FIND_PACKAGE(OpenGL REQUIRED)
+FIND_PACKAGE(UPCXX REQUIRED)
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
+INCLUDE_DIRECTORIES(
+  /opt/local/bananas
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${UPCXX_INCLUDE_DIR}
+  ${GASNET_INCLUDE_DIR}
+  ${GASNET_CONDUIT_INCLUDE_DIR}
+)
 
 ADD_EXECUTABLE(renderer
   renderer.cpp
@@ -25,5 +32,9 @@ ADD_EXECUTABLE(renderer
   regression.cpp
 )
 
-include_directories(${UPCXX_INCLUDE_DIR})
-TARGET_LINK_LIBRARIES(renderer sys lexers loaders image device ${OPENGL_LIBRARY} ${GLUT_LIBRARY} ${UPCXX_LIBRARIES})
+TARGET_LINK_LIBRARIES(renderer sys lexers loaders image device
+  ${OPENGL_LIBRARY} ${GLUT_LIBRARY}
+  -L${UPCXX_LIBRARY_PATH} upcxx
+  -L${GASNET_LIBRARY_PATH} gasnet-mpi-seq ammpi gcc_eh
+  ${MPI_C_LIBRARIES}
+)

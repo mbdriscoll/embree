@@ -8,6 +8,8 @@
 
 include(FindPackageHandleStandardArgs)
 
+find_package(GASNET REQUIRED)
+
 find_path(UPCXX_INCLUDE_DIR
     NAMES
         upcxx.h
@@ -30,16 +32,7 @@ find_path( UPCXX_LIBRARY_PATH
         "The upcxx core library"
 )
 
-set (UPCXX_FOUND "NO")
-if(UPCXX_INCLUDE_DIR)
-  if(UPCXX_LIBRARY_PATH)
-    set (UPCXX_LIBRARIES "-L${UPCXX_LIBRARY_PATH} -lupcxx")
-    set (UPCXX_INCLUDE_PATH ${UPCXX_INCLUDE_DIR})
-    set (UPCXX_FOUND "YES")
-  endif(UPCXX_LIBRARY_PATH)
-endif(UPCXX_INCLUDE_DIR)
-
 find_package_handle_standard_args(UPCXX DEFAULT_MSG
     UPCXX_INCLUDE_DIR
-    UPCXX_LIBRARIES
+    UPCXX_LIBRARY_PATH
 )
