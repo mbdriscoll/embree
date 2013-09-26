@@ -227,6 +227,10 @@ namespace embree
     
     /* store to disk */
     void* ptr = g_device->rtMapFrameBuffer(g_frameBuffer);
+
+    std::vector<char> tmpptr((char*)ptr, ((char*)ptr)+g_width*g_height*4);
+    upcxx::upcxx_reduce<char>((char*) &tmpptr[0], (char*) ptr, g_width*g_height*4, 0, UPCXX_SUM, UPCXX_CHAR);
+
     Ref<Image> image = null;
     if      (g_format == "RGB8"        )  image = new Image3c(g_width, g_height, (Col3c*)ptr); 
     else if (g_format == "RGBA8"       )  image = new Image4c(g_width, g_height, (Col4c*)ptr);
