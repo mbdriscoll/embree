@@ -203,6 +203,7 @@ namespace embree
 
   static void displayMode()
   {
+    throw std::runtime_error("Michael disabled interactive mode. Use \"-o image.tga -spp 64\" to write an image file.");
     if (!g_renderer) throw std::runtime_error("no renderer set");
     AffineSpace3f camSpace = AffineSpace3f::lookAtPoint(g_camPos, g_camLookAt, g_camUp);
     float speed = 0.02f * length(g_camLookAt - g_camPos);
