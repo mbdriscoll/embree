@@ -14,15 +14,12 @@
 ## limitations under the License.                                           ##
 ## ======================================================================== ##
 
-FIND_PACKAGE(GLUT REQUIRED)
-FIND_PACKAGE(OpenGL REQUIRED)
-
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
 ADD_EXECUTABLE(renderer
   renderer.cpp
-  glutdisplay.cpp
+  #glutdisplay.cpp
   regression.cpp
 )
 
-TARGET_LINK_LIBRARIES(renderer sys lexers loaders image device ${OPENGL_LIBRARY} ${GLUT_LIBRARY})
+TARGET_LINK_LIBRARIES(renderer sys lexers loaders image device)

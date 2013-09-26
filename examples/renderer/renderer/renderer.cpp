@@ -69,7 +69,7 @@ namespace embree
   int g_verbose_output = 0;
 
   /* logging settings */
-  extern bool log_display;
+  //extern bool log_display;
   bool g_profiling = false;
 
   /******************************************************************************/
@@ -201,12 +201,14 @@ namespace embree
 
   static void displayMode()
   {
+#if 0 // mbd: avoid glut dependence
     if (!g_renderer) throw std::runtime_error("no renderer set");
     AffineSpace3f camSpace = AffineSpace3f::lookAtPoint(g_camPos, g_camLookAt, g_camUp);
     float speed = 0.02f * length(g_camLookAt - g_camPos);
     Handle<Device::RTScene> scene = createScene();
     GLUTDisplay(camSpace, speed, scene);
     g_rendered = true;
+#endif
   }
 
   static void outputMode(const FileName& fileName)
@@ -312,7 +314,7 @@ namespace embree
 
       /* turn off logging */
       else if (tag == "--no-logging") {
-        log_display = false;
+        //log_display = false;
       }
 
       else if (tag == "-profiling") {
@@ -575,7 +577,7 @@ namespace embree
         g_refine = false;
         g_regression = true;
         Handle<Device::RTScene> scene;
-        GLUTDisplay(AffineSpace3f::lookAtPoint(g_camPos, g_camLookAt, g_camUp), 0.01f, scene);
+        // mbd: avoid glut. GLUTDisplay(AffineSpace3f::lookAtPoint(g_camPos, g_camLookAt, g_camUp), 0.01f, scene);
       }
 
       else if (tag == "-version") {
