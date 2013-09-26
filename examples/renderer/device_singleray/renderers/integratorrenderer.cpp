@@ -14,6 +14,8 @@
 // limitations under the License.                                           //
 // ======================================================================== //
 
+#include <upcxx.h>
+
 #include "renderers/integratorrenderer.h"
 
 /* include all integrators */
@@ -117,12 +119,14 @@ namespace embree
     IntegratorState state;
     if (taskIndex == taskCount-1) t0 = getSeconds();
     
+    // mbd: seeing "Hello from thread 4294967295 of 0" for 1 UPC Thread, 1 system thread
+    // the big number is straight 1's in binary.
+    std::cout << "Hello from thread " << MYTHREAD
+              << " of " << THREADS << "." << std::endl;
+
     /*! tile pick loop */
-    while (true)
-    {
-      /*! pick a new tile */
-      size_t tile = tileID++;
-      if (tile >= numTilesX*numTilesY) break;
+    // mbd: #pragma omp parallel for, eventually, i think
+    for (int tile = MYTHREAD; tile < numTilesX*numTilesY; tile += THREADS) {
 
       /*! process all tile samples */
       const int tile_x = (tile%numTilesX)*TILE_SIZE;
@@ -167,9 +171,6 @@ namespace embree
       
       /*! print progress bar */
       if (renderer->showProgress) progress.next();
-
-      /*! mark one more tile as finished */
-      framebuffer->finishTile();
     }
 
     /*! we access the atomic ray counter only once per tile */
