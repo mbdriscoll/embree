@@ -43,10 +43,6 @@ ELSE ()
   include_directories(${GASNET_INCLUDE_DIR})
   include_directories(${GASNET_CONDUIT_INCLUDE_DIR})
   ADD_LIBRARY(device_singleray${EXT} SHARED ${SOURCES})
-  TARGET_LINK_LIBRARIES(device_singleray${EXT} sys${EXT} embree${EXT} image${EXT}
-    -L${UPCXX_LIBRARY_PATH} upcxx
-    -L${GASNET_LIBRARY_PATH} gasnet-mpi-seq ammpi
-    ${MPI_C_LIBRARIES}
-  )
+  TARGET_LINK_LIBRARIES(device_singleray${EXT} sys${EXT} embree${EXT} image${EXT})
 
 ENDIF ()

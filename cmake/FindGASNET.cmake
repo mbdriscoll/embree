@@ -29,8 +29,8 @@ find_path(GASNET_CONDUIT_INCLUDE_DIR
         gasnet_core.h
     PATHS
         /Users/mbdriscoll/opt/gasnet-1.20.2/include/mpi-conduit
-        ${GASNET_LOCATION}/include
-        $ENV{GASNET_LOCATION}/include
+        ${GASNET_LOCATION}/include/mpi-conduit
+        $ENV{GASNET_LOCATION}/include/mpi-conduit
     DOC
         "The directory where gasnet.h resides"
 )

@@ -14,8 +14,6 @@
 ## limitations under the License.                                           ##
 ## ======================================================================== ##
 
-FIND_PACKAGE(GLUT REQUIRED)
-FIND_PACKAGE(OpenGL REQUIRED)
 FIND_PACKAGE(UPCXX REQUIRED)
 
 INCLUDE_DIRECTORIES(
@@ -27,11 +25,12 @@ INCLUDE_DIRECTORIES(
 
 ADD_EXECUTABLE(renderer
   renderer.cpp
-  glutdisplay.cpp
+  #glutdisplay.cpp
   regression.cpp
 )
 
 TARGET_LINK_LIBRARIES(renderer sys lexers loaders image device
-  ${OPENGL_LIBRARY} ${GLUT_LIBRARY}
-  device_singleray # mbd: link here to prevent doubly-defining symbols
+  -L${UPCXX_LIBRARY_PATH} upcxx
+  -L${GASNET_LIBRARY_PATH} gasnet-mpi-seq ammpi
+  ${MPI_C_LIBRARIES}
 )

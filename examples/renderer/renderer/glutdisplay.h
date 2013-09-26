@@ -32,6 +32,6 @@
 namespace embree
 {
   /* starts display mode */
-  void GLUTDisplay(const AffineSpace3f& camSpace, float speed, Handle<Device::RTScene>& scene);
+  //void GLUTDisplay(const AffineSpace3f& camSpace, float speed, Handle<Device::RTScene>& scene);
 }
 

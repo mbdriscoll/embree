@@ -27,7 +27,9 @@ find_path( UPCXX_LIBRARY_PATH
     PATHS
         /Users/mbdriscoll/opt/upcxx-0.0.0/lib
         ${UPCXX_LOCATION}/lib
+        ${UPCXX_LOCATION}/build
         $ENV{UPCXX_LOCATION}/lib
+        $ENV{UPCXX_LOCATION}/build
     DOC
         "The upcxx core library"
 )
