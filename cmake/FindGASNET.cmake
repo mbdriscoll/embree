@@ -46,7 +46,7 @@ find_path(GASNET_LIBRARY_PATH
         "The gasnet library"
 )
 
-add_definitions( -DGASNET_SEQ )
+add_definitions( -DGASNET_SEQ -DGASNETT_USE_GCC_ATTRIBUTE_MAYALIAS )
 
 find_package_handle_standard_args(GASNET DEFAULT_MSG
     GASNET_INCLUDE_DIR

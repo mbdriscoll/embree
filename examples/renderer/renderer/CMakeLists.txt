@@ -29,7 +29,10 @@ ADD_EXECUTABLE(renderer
   regression.cpp
 )
 
+SET(CMAKE_CXX_LINK_EXECUTABLE "CC -fPIC <LINK_FLAGS> -o <TARGET> ${CMAKE_GNULD_IMAGE_VERSION} <OBJECTS> <LINK_LIBRARIES>")
+
 TARGET_LINK_LIBRARIES(renderer sys lexers loaders image device
+  pthread dl hugetlbfs
   device_singleray
   -L${UPCXX_LIBRARY_PATH} upcxx
   -L${GASNET_LIBRARY_PATH} gasnet-mpi-seq ammpi
