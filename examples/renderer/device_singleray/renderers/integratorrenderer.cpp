@@ -54,7 +54,7 @@ namespace embree
     gamma = parms.getFloat("gamma",1.0f);
 
     /*! show progress to the user */
-    showProgress = parms.getInt("showprogress",0);
+    showProgress = (MYTHREAD == 0); //parms.getInt("showprogress",0);
   }
 
   void IntegratorRenderer::renderFrame(const Ref<Camera>& camera, const Ref<BackendScene>& scene, const Ref<ToneMapper>& toneMapper, Ref<SwapChain > swapchain, int accumulate) 
