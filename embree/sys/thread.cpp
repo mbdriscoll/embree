@@ -77,7 +77,8 @@ namespace embree
 
   /*! set affinity of the calling thread */
   void setAffinity(ssize_t affinity) {
-    setAffinity(GetCurrentThread(), affinity);
+    printf("Michael disabled setAffinity.\n");
+    //setAffinity(GetCurrentThread(), affinity);
   }
 
   struct ThreadStartupData 
@@ -105,7 +106,8 @@ namespace embree
   {
     HANDLE thread = CreateThread(NULL, stack_size, (LPTHREAD_START_ROUTINE)threadStartup, new ThreadStartupData(f,arg), 0, NULL);
     if (thread == NULL) throw std::runtime_error("cannot create thread");
-    if (threadID >= 0) setAffinity(thread, threadID);
+    printf("Michael disabled setAffinity.\n");
+    //if (threadID >= 0) setAffinity(thread, threadID);
     return thread_t(thread);
   }
 
@@ -161,12 +163,13 @@ namespace embree
   /*! set affinity of the calling thread */
   void setAffinity(ssize_t affinity)
   {
-    cpu_set_t cset;
-    CPU_ZERO(&cset);
-    CPU_SET(affinity, &cset);
+    printf("Michael disabled setAffinity.\n");
+    //cpu_set_t cset;
+    //CPU_ZERO(&cset);
+    //CPU_SET(affinity, &cset);
 
-    if (pthread_setaffinity_np(pthread_self(), sizeof(cset), &cset) != 0)
-      std::cerr << "Thread: cannot set affinity" << std::endl;
+    //if (pthread_setaffinity_np(pthread_self(), sizeof(cset), &cset) != 0)
+    //  std::cerr << "Thread: cannot set affinity" << std::endl;
   }
 }
 #endif
@@ -226,8 +229,9 @@ namespace embree
     _mm_setcsr(_mm_getcsr() | /*FTZ:*/ (1<<15) | /*DAZ:*/ (1<<6));
 
 #if !defined(__LINUX__) || defined(__MIC__)
-    if (parg->affinity >= 0)
-      setAffinity(parg->affinity);
+    printf("Michael disabled setAffinity.\n");
+    //if (parg->affinity >= 0)
+      //setAffinity(parg->affinity);
 #endif
 
 
@@ -250,12 +254,13 @@ namespace embree
     
     /* set affinity */
 #if defined(__LINUX__)
-    if (threadID >= 0) {
-      cpu_set_t cset;
-      CPU_ZERO(&cset);
-      CPU_SET(threadID, &cset);
-      pthread_attr_setaffinity_np(&attr,sizeof(cpu_set_t),&cset);
-    }
+    printf("Michael disabled setAffinity.\n");
+    //if (threadID >= 0) {
+    //  cpu_set_t cset;
+    //  CPU_ZERO(&cset);
+    //  CPU_SET(threadID, &cset);
+    //  pthread_attr_setaffinity_np(&attr,sizeof(cpu_set_t),&cset);
+    //}
 #endif
 
     /* create thread */
