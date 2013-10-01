@@ -23,6 +23,8 @@ INCLUDE_DIRECTORIES(
   ${GASNET_CONDUIT_INCLUDE_DIR}
 )
 
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+
 ADD_EXECUTABLE(renderer
   renderer.cpp
   #glutdisplay.cpp

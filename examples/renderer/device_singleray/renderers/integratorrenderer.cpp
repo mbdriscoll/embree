@@ -15,6 +15,7 @@
 // ======================================================================== //
 
 #include <upcxx.h>
+#include <omp.h>
 
 #include "renderers/integratorrenderer.h"
 
@@ -52,9 +53,6 @@ namespace embree
 
     /*! get framebuffer configuration */
     gamma = parms.getFloat("gamma",1.0f);
-
-    /*! show progress to the user */
-    showProgress = (MYTHREAD == 0); //parms.getInt("showprogress",0);
   }
 
   void IntegratorRenderer::renderFrame(const Ref<Camera>& camera, const Ref<BackendScene>& scene, const Ref<ToneMapper>& toneMapper, Ref<SwapChain > swapchain, int accumulate) 
@@ -75,27 +73,17 @@ namespace embree
     rcpHeight = rcp(float(swapchain->getHeight()));
     this->framebuffer = swapchain->buffer();
     this->framebuffer->startRendering(numTilesX*numTilesY);
-    if (renderer->showProgress) new (&progress) Progress(numTilesX*numTilesY);
 
-    if (renderer->showProgress) progress.start();
     renderer->samplers->reset();
     renderer->integrator->requestSamples(renderer->samplers, scene);
     renderer->samplers->init(iteration,renderer->filter);
 
-#if 1
-    TaskScheduler::EventSync event;
-    TaskScheduler::Task task(&event,_renderTile,this,TaskScheduler::getNumThreads(),_finish,this,"render::tile");
-    TaskScheduler::addTask(-1,TaskScheduler::GLOBAL_BACK,&task);
-    event.sync();
-#else
-    new (&task) TaskScheduler::Task (NULL,_renderTile,this,TaskScheduler::getNumThreads(),_finish,this,"render::tile");
-    TaskScheduler::addTask(-1,TaskScheduler::GLOBAL_BACK,&task);
-#endif
+    // mbd: skip task system
+    this->renderTile(0, 1, 0, 1, NULL);
   }
 
   void IntegratorRenderer::RenderJob::finish(size_t threadIndex, size_t threadCount, TaskScheduler::Event* event)
   {
-    if (renderer->showProgress) progress.end();
     double dt = getSeconds()-t0;
 
     if (MYTHREAD == 0) {
@@ -117,12 +105,18 @@ namespace embree
 
   void IntegratorRenderer::RenderJob::renderTile(size_t threadIndex, size_t threadCount, size_t taskIndex, size_t taskCount, TaskScheduler::Event* event)
   {
+    // mbd: ignore all arguments, they no longer mean anything
+
+    #pragma omp parallel
+    {
+
     /*! create a new sampler */
     IntegratorState state;
     if (taskIndex == taskCount-1) t0 = getSeconds();
     
     /*! tile pick loop */
-    for (size_t tile = MYTHREAD; tile < numTilesX*numTilesY; tile += THREADS) {
+    #pragma omp for schedule(dynamic,1)
+    for (int tile = MYTHREAD; tile < numTilesX*numTilesY; tile += THREADS) {
 
       /*! process all tile samples */
       const int tile_x = (tile%numTilesX)*TILE_SIZE;
@@ -164,15 +158,14 @@ namespace embree
           framebuffer->set(x, _y, L1);
         }
       }
-      
-      /*! print progress bar */
-      if (renderer->showProgress) progress.next();
     }
-
-    /*! mbd: signal we've finished all the tiles */
-    framebuffer->finishTile(numTilesX*numTilesY);
 
     /*! we access the atomic ray counter only once per tile */
     atomicNumRays += state.numRays;
+
+    } // end pragma omp parallel
+
+    /*! mbd: signal we've finished all the tiles */
+    framebuffer->finishTile(numTilesX*numTilesY);
   }
 }

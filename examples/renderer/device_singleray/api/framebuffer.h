@@ -53,26 +53,16 @@ namespace embree
 
     /*! signals the framebuffer that rendering starts */
     void startRendering(size_t numTiles = 1) {
-      Lock<MutexSys> lock(mutex);
-      remainingTiles = numTiles;
     }
     
     /*! register a tile as finished */
     bool finishTile(int numTiles = 1)
     {
-      Lock<MutexSys> lock(mutex);
-      remainingTiles-=numTiles;
-      if (remainingTiles == 0) {
-        condition.broadcast();
-        return true;
-      }
       return false;
     }
     
     /*! wait for rendering to finish */
     virtual void wait() {
-      Lock<MutexSys> lock(mutex);
-      while (remainingTiles != 0) condition.wait(mutex);
     }
     
   protected:
