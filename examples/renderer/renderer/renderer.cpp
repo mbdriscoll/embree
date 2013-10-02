@@ -15,6 +15,7 @@
 // ======================================================================== //
 
 #include <upcxx.h>
+#include <omp.h>
 
 #include "sys/platform.h"
 #include "sys/filename.h"
@@ -224,6 +225,9 @@ namespace embree
     Handle<Device::RTScene> scene = createScene();
     g_device->rtSetInt1(g_renderer, "showprogress", 1);
     g_device->rtCommit(g_renderer);
+
+    double start_time = omp_get_wtime();
+    double compute_start = omp_get_wtime();
     g_device->rtRenderFrame(g_renderer, camera, scene, g_tonemapper, g_frameBuffer, 0);
     for (int i=0; i<g_numBuffers; i++)
       g_device->rtSwapBuffers(g_frameBuffer);
@@ -231,10 +235,39 @@ namespace embree
     /* store to disk */
     void* ptr = g_device->rtMapFrameBuffer(g_frameBuffer);
 
+    double compute_time = omp_get_wtime() - compute_start;
+    double imbalance_start = omp_get_wtime();
+    upcxx::barrier();
+    double imbalance_time = omp_get_wtime() - imbalance_start;
+    double reduce_start = omp_get_wtime();
+
     std::vector<char> tmpptr((char*)ptr, ((char*)ptr)+g_width*g_height*4);
     upcxx::upcxx_reduce<char>((char*) &tmpptr[0], (char*) ptr, g_width*g_height*4, 0, UPCXX_SUM, UPCXX_CHAR);
 
     // buggy without this
+    upcxx::barrier();
+    double reduce_time = omp_get_wtime() - reduce_start;
+    double total_time = omp_get_wtime() - start_time;
+
+    double compute_min, compute_max, compute_avg,
+           imbalance_min, imbalance_max, imbalance_avg,
+           reduce_min, reduce_max, reduce_avg;
+
+    upcxx::upcxx_reduce<double>(&compute_time, &compute_min, 1, 0, UPCXX_MIN, UPCXX_DOUBLE);
+    upcxx::upcxx_reduce<double>(&compute_time, &compute_max, 1, 0, UPCXX_MAX, UPCXX_DOUBLE);
+    upcxx::upcxx_reduce<double>(&compute_time, &compute_avg, 1, 0, UPCXX_SUM, UPCXX_DOUBLE);
+    compute_avg /= (double) THREADS;
+
+    upcxx::upcxx_reduce<double>(&imbalance_time, &imbalance_min, 1, 0, UPCXX_MIN, UPCXX_DOUBLE);
+    upcxx::upcxx_reduce<double>(&imbalance_time, &imbalance_max, 1, 0, UPCXX_MAX, UPCXX_DOUBLE);
+    upcxx::upcxx_reduce<double>(&imbalance_time, &imbalance_avg, 1, 0, UPCXX_SUM, UPCXX_DOUBLE);
+    imbalance_avg /= (double) THREADS;
+
+    upcxx::upcxx_reduce<double>(&reduce_time, &reduce_min, 1, 0, UPCXX_MIN, UPCXX_DOUBLE);
+    upcxx::upcxx_reduce<double>(&reduce_time, &reduce_max, 1, 0, UPCXX_MAX, UPCXX_DOUBLE);
+    upcxx::upcxx_reduce<double>(&reduce_time, &reduce_avg, 1, 0, UPCXX_SUM, UPCXX_DOUBLE);
+    reduce_avg /= (double) THREADS;
+
     upcxx::barrier();
 
     if (MYTHREAD == 0) {
@@ -245,6 +278,22 @@ namespace embree
         else if (g_format == "RGBA_FLOAT32")  image = new Image4f(g_width, g_height, (Col4f*)ptr);
         else throw std::runtime_error("unsupported framebuffer format: "+g_format);
         storeImage(image, fileName);
+
+#ifdef GNUPLOTABLE
+        printf("# nThreads total compute_(min,max,avg) imbalance_(min,max,avg) reduce_{min,max,avg}\n");
+        printf("%f  %f %f %f  %f %f %f  %f %f %f\n",
+                total,
+                compute_min, compute_max, compute_avg,
+                imbalance_min, imbalance_max, imbalance_avg,
+                reduce_min, reduce_max, reduce_avg);
+#else
+        printf("Total time: %f seconds\n", total_time);
+        printf("Per-thread costs in seconds (%d total UPC threads):\n", THREADS);
+        printf("operation min      max      avg\n");
+        printf("compute   %f %f %f\n", compute_min,   compute_max,   compute_avg);
+        printf("imbalance %f %f %f\n", imbalance_min, imbalance_max, imbalance_avg);
+        printf("reduce    %f %f %f\n", reduce_min,    reduce_max,    reduce_avg);
+#endif
     }
 
     g_device->rtUnmapFrameBuffer(g_frameBuffer);
@@ -267,6 +316,8 @@ namespace embree
     {
       std::string tag = cin->peek();
       if (tag == "-threads") {
+        printf("Michael disabled setting -threads. Use OMP_NUM_THREADS env var instead.\n");
+        exit(1);
         cin->getString();
         g_numThreads = cin->getInt();
       }

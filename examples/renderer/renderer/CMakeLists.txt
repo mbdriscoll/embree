@@ -15,6 +15,7 @@
 ## ======================================================================== ##
 
 FIND_PACKAGE(UPCXX REQUIRED)
+FIND_PACKAGE(OpenMP REQUIRED)
 
 INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}
