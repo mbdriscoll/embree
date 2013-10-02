@@ -288,7 +288,7 @@ namespace embree
                 reduce_min, reduce_max, reduce_avg);
 #else
         printf("Total time: %f seconds\n", total_time);
-        printf("Per-thread costs in seconds (%d total UPC threads):\n", THREADS);
+        printf("Per-thread costs in seconds (%d total UPC Threads, %d threads/Thread):\n", THREADS, omp_get_max_threads());
         printf("operation min      max      avg      %%\n");
         printf("compute   %f %f %f %2.2f%%\n", compute_min,   compute_max,   compute_avg,   compute_avg / total_time * 100.0);
         printf("imbalance %f %f %f %2.2f%%\n", imbalance_min, imbalance_max, imbalance_avg, imbalance_max / total_time * 100.0);
