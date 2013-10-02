@@ -630,12 +630,6 @@ namespace embree
           g_outFileName = fn; //outputMode(path + cin->getFileName());
         else
           g_outFileName = path+fn; //outputMode(path + cin->getFileName());
-
-        // XXX mbd: for now, write each image into separate file
-        // for thread 6: sphere.tga -> sphere.6.tga
-        std::stringstream ss;
-        ss << MYTHREAD;
-        g_outFileName.insert(g_outFileName.size()-4,"."+ss.str());
       }
 
       /* display image */
