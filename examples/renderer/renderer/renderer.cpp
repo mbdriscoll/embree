@@ -279,10 +279,10 @@ namespace embree
         else throw std::runtime_error("unsupported framebuffer format: "+g_format);
         storeImage(image, fileName);
 
-#ifdef GNUPLOTABLE
-        printf("# nThreads total compute_(min,max,avg) imbalance_(min,max,avg) reduce_{min,max,avg}\n");
-        printf("%f  %f %f %f  %f %f %f  %f %f %f\n",
-                total,
+#if 1 
+        printf("# nUpcThreads nOmpThreads spp total_time compute_(min,max,avg) imbalance_(min,max,avg) reduce_{min,max,avg}\n");
+        printf("%d %d %d  %f  %f %f %f  %f %f %f  %f %f %f\n",
+                THREADS, omp_get_max_threads(), g_spp, total_time,
                 compute_min, compute_max, compute_avg,
                 imbalance_min, imbalance_max, imbalance_avg,
                 reduce_min, reduce_max, reduce_avg);
