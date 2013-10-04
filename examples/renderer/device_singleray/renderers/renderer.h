@@ -31,7 +31,7 @@ namespace embree
   public:
 
     /*! tile size to use for rendering */
-    enum { TILE_SIZE = 16 };
+    enum { TILE_SIZE = 8 };
 
     /*! Renderers need a virtual destructor. */
     virtual ~Renderer() {}
