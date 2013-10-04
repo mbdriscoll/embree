@@ -15,6 +15,7 @@
 ## ======================================================================== ##
 
 CONFIGURE_CPU ()
+
 FIND_PACKAGE(UPCXX REQUIRED)
 FIND_PACKAGE(OpenMP REQUIRED)
 
@@ -39,10 +40,8 @@ IF (__XEON_PHI__)
   ADD_EXECUTABLE(device_singleray${EXT} ${SOURCES})
   TARGET_LINK_LIBRARIES(device_singleray${EXT} sys${EXT} embree${EXT} coi_server${EXT})
 ELSE ()
-  add_definitions( -DGASNET_SEQ -DGASNETT_USE_GCC_ATTRIBUTE_MAYALIAS )
+  add_definitions(${UPCXX_DEFINES})
   include_directories(${UPCXX_INCLUDE_DIR})
-  include_directories(${GASNET_INCLUDE_DIR})
-  include_directories(${GASNET_CONDUIT_INCLUDE_DIR})
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
   ADD_LIBRARY(device_singleray${EXT} STATIC ${SOURCES})
   TARGET_LINK_LIBRARIES(device_singleray${EXT} sys${EXT} embree${EXT} image${EXT})

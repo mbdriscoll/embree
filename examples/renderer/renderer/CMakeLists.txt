@@ -20,10 +20,10 @@ FIND_PACKAGE(OpenMP REQUIRED)
 INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${UPCXX_INCLUDE_DIR}
-  ${GASNET_INCLUDE_DIR}
-  ${GASNET_CONDUIT_INCLUDE_DIR}
 )
 
+ADD_DEFINITIONS(${UPCXX_DEFINES})
+LINK_DIRECTORIES(${UPCXX_LIBRARY_PATH})
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 
 ADD_EXECUTABLE(renderer
@@ -33,11 +33,10 @@ ADD_EXECUTABLE(renderer
 )
 
 IF (APPLE)
-  # use normal linking command
+  # use default linking command
   TARGET_LINK_LIBRARIES(renderer sys lexers loaders image device
     device_singleray
-    -L${UPCXX_LIBRARY_PATH} upcxx
-    -L${GASNET_LIBRARY_PATH} gasnet-mpi-seq ammpi
+    ${UPCXX_LIBRARIES}
     ${MPI_C_LIBRARIES}
   )
 ELSE ()
@@ -45,8 +44,7 @@ ELSE ()
   TARGET_LINK_LIBRARIES(renderer sys lexers loaders image device
     pthread dl hugetlbfs
     device_singleray
-    -L${UPCXX_LIBRARY_PATH} upcxx
-    -L${GASNET_LIBRARY_PATH} gasnet-mpi-seq ammpi
+    ${UPCXX_LIBRARIES}
     ${MPI_C_LIBRARIES}
   )
 ENDIF ()

@@ -167,5 +167,6 @@ namespace embree
 
     /*! mbd: signal we've finished all the tiles */
     framebuffer->finishTile(numTilesX*numTilesY);
+    printf("%d total tiles\n", numTilesX*numTilesY);
   }
 }

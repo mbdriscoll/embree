@@ -5,6 +5,7 @@
 # GASNET_CONDUIT_INCLUDE_DIR
 # GASNET_INCLUDE_DIR
 # GASNET_LIBRARIES
+# GASNET_DEFINES
 #
 
 # TODO: handle different conduit/configurations
@@ -46,7 +47,13 @@ find_path(GASNET_LIBRARY_PATH
         "The gasnet library"
 )
 
-add_definitions( -DGASNET_SEQ -DGASNETT_USE_GCC_ATTRIBUTE_MAYALIAS )
+set(GASNET_DEFINES -DGASNET_SEQ -DGASNETT_USE_GCC_ATTRIBUTE_MAYALIAS CACHE INTERNAL "gasnet defines")
+
+if (APPLE)
+  SET(GASNET_LIBRARIES gasnet-mpi-seq ammpi ${MPI_CXX_LIBRARIES} CACHE INTERNAL "gasnet libs")
+else ()
+  SET(GASNET_LIBRARIES gasnet-mpi-seq ammpi ${MPI_CXX_LIBRARIES} pthread dl hugetlbfs CACHE INTERNAL "gasnet libs")
+endif ()
 
 find_package_handle_standard_args(GASNET DEFAULT_MSG
     GASNET_INCLUDE_DIR
