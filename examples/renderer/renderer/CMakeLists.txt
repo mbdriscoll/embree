@@ -42,7 +42,6 @@ IF (APPLE)
 ELSE ()
   SET(CMAKE_CXX_LINK_EXECUTABLE "CC -fPIC ${OpenMP_CXX_FLAGS} <LINK_FLAGS> -o <TARGET> ${CMAKE_GNULD_IMAGE_VERSION} <OBJECTS> <LINK_LIBRARIES>")
   TARGET_LINK_LIBRARIES(renderer sys lexers loaders image device
-    pthread dl hugetlbfs
     device_singleray
     ${UPCXX_LIBRARIES}
     ${MPI_C_LIBRARIES}
